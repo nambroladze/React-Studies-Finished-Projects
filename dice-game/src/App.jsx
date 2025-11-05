@@ -1,66 +1,101 @@
 import { useState } from "react";
-import DiceBasic from "./components/DiceGamePlayers";
+import Player from "./components/Player";
 import WinnerBanner from "./components/WinnerBanner";
 
 function App() {
-  const diceEmojis = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+  const [player1Dice, setPlayer1Dice] = useState(null);
+  const [player2Dice, setPlayer2Dice] = useState(null);
 
-  const [player1, setPlayer1] = useState(null);
-  const [player2, setPlayer2] = useState(null);
-  const [currentPlayer, setCurrentPlayer] = useState(1);
+  const [players, setPlayers] = useState({
+    player1: null,
+    player2: null,
+  });
 
-  const rollDice = () => {
-    const randomNum = Math.floor(Math.random() * 6) + 1;
+  const currentPlayer = players.player1 == null ? 1 : 2;
 
-    if (currentPlayer === 1) 
-      {
-      setPlayer1(randomNum);
-      setCurrentPlayer(2);
+  const playAgain = () => {
+    setPlayers({ player1: null, player2: null });
+  };
+
+  const winner = () => {
+    if (players.player1 === null || players.player2 === null) {
+      return null;
+    }
+
+    if (players.player1 > players.player2) {
+      return "Player 1";
+    } else if (players.player2 > players.player1) {
+      return "Player 2";
     } else {
-      setPlayer2(randomNum);
-      setCurrentPlayer(1);
+      return "tie";
     }
   };
 
-  const getWinner = () => 
-    {
-    if (player1 === null || player2 === null) return "";
-    if (player1 > player2) return "🎉 Player 1 Wins!";
-    if (player2 > player1) return "🏆 Player 2 Wins!";
-    return "🤝 It's a Tie!";
-  };
+  const rollDice = () => {
+    const randomNumber = Math.floor(Math.random() * 6) + 1;
 
-  const resetGame = () => {
-    setPlayer1(null);
-    setPlayer2(null);
-    setCurrentPlayer(1);
+    if (currentPlayer === 1) {
+      // setPlayer1Dice(randomNumber);
+      setPlayers((prev) => ({ ...prev, player1: randomNumber }));
+    } else {
+      // setPlayer2Dice(randomNumber);
+      setPlayers((prev) => ({ ...prev, player2: randomNumber }));
+    }
   };
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      <h1>Dice Game 🎲</h1>
+    <div
+      style={{
+        textAlign: "center",
+        padding: "20px",
+        margin: 0,
+      }}
+    >
+      <h1>🎲 2-Player Dice Game 🎲</h1>
 
-      <DiceBasic
-        title="Player 1"
-        dice={player1 !== null ? diceEmojis[player1 - 1] : "?"}
-        handleClick={rollDice}
-        isDisabled={currentPlayer === 2}
-      />
+      <p style={{ fontSize: "20px", margin: "20px 0" }}>
+        {currentPlayer === 1 ? "Player 1's turn!" : "Player 2's turn!"}
+      </p>
 
-      <div style={{ fontSize: "24px", margin: "10px" }}>VS</div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+          margin: "30px 0",
+        }}
+      >
+        <Player
+          title={"Player 1"}
+          onClick={rollDice}
+          text={"🎲 Roll Dice"}
+          disabled={currentPlayer !== 1 || players.player2 !== null}
+          dice={player1Dice}
+          color={"#4CAF50"}
+        />
 
-      <DiceBasic
-        title="Player 2"
-        dice={player2 !== null ? diceEmojis[player2 - 1] : "?"}
-        handleClick={rollDice}
-        isDisabled={currentPlayer === 1}
-      />
+        <div
+          style={{
+            fontSize: "40px",
+          }}
+        >
+          VS
+        </div>
 
-      <WinnerBanner winnerText={getWinner()} onReset={resetGame} />
+        <Player
+          title={"Player 2"}
+          onClick={rollDice}
+          text={"🎲 Roll Dice"}
+          disabled={currentPlayer !== 2 || players.player2 !== null}
+          dice={player2Dice}
+          color={"#1E88E5"}
+        />
+      </div>
+
+      {winner() && <WinnerBanner winner={winner()} onPlayAgain={playAgain} />}
+      {/* {winner() ?? "we don't have a winner yet"} */}
     </div>
   );
 }
-
-
 
 export default App;
