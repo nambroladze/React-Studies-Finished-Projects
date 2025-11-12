@@ -1,4 +1,22 @@
-export default function WinnerBanner({ onPlayNextRound, winner, rounds = 5 }) {
+export default function WinnerBanner({
+  onPlayNextRound,
+  player1dice,
+  player2dice,
+  rounds = 5,
+}) {
+  if (player1dice === null || player2dice === null) {
+    return null;
+  }
+
+  let winner = null;
+
+  if (player1dice > player2dice) {
+    winner = "Player 1";
+  } else if (player2dice > player1dice) {
+    winner = "Player 2";
+  } else {
+    winner = "tie";
+  }
   const color = () => {
     if (winner === "tie") {
       return "#FFA500";
@@ -34,6 +52,7 @@ export default function WinnerBanner({ onPlayNextRound, winner, rounds = 5 }) {
       >
         "Winner of the round {rounds}"
       </div>
+
       <h2 style={{ margin: "0 0 20px 0", fontSize: "36px" }}>{winner}</h2>
 
       <button
@@ -50,7 +69,7 @@ export default function WinnerBanner({ onPlayNextRound, winner, rounds = 5 }) {
           fontWeight: "bold",
         }}
       >
-        🎲 Play Again
+        {rounds === 5 ? "View Stats" : "🎲Play Next Round 🎲"}
       </button>
     </div>
   );
